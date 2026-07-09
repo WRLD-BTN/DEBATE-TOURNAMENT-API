@@ -23,6 +23,18 @@ const loginSchema = z.object({
  *   post:
  *     summary: Register a new user
  *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password, name]
+ *             properties:
+ *               email: { type: string, example: [email protected] }
+ *               password: { type: string, example: AdminPass123 }
+ *               name: { type: string, example: Admin }
+ *               role: { type: string, enum: [ADMIN, ADJUDICATOR, DEBATER], example: ADMIN }
  */
 router.post('/register', validate(registerSchema), register);
 
@@ -32,6 +44,16 @@ router.post('/register', validate(registerSchema), register);
  *   post:
  *     summary: Log in and receive a JWT
  *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email: { type: string, example: [email protected] }
+ *               password: { type: string, example: AdminPass123 }
  */
 router.post('/login', validate(loginSchema), login);
 

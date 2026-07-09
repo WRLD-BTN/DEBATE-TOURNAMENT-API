@@ -32,6 +32,19 @@ const createSchema = z.object({
  *   post:
  *     summary: Create a tournament (admin only)
  *     tags: [Tournaments]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, startDate, endDate]
+ *             properties:
+ *               name: { type: string, example: BUSE Easters 2026 }
+ *               location: { type: string, example: Bindura University of Science Education }
+ *               startDate: { type: string, format: date-time, example: "2026-08-01T00:00:00.000Z" }
+ *               endDate: { type: string, format: date-time, example: "2026-08-02T00:00:00.000Z" }
+ *               breakSize: { type: integer, example: 4 }
  */
 router.get('/', listTournaments);
 router.post('/', requireAuth, requireRole('ADMIN'), validate(createSchema), createTournament);
@@ -42,6 +55,11 @@ router.post('/', requireAuth, requireRole('ADMIN'), validate(createSchema), crea
  *   get:
  *     summary: Get a tournament with teams and rounds
  *     tags: [Tournaments]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
  */
 router.get('/:id', getTournament);
 
@@ -51,6 +69,11 @@ router.get('/:id', getTournament);
  *   get:
  *     summary: Computed standings (team points, speaker points) across all rounds so far
  *     tags: [Tournaments]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
  */
 router.get('/:id/standings', getStandings);
 
@@ -60,6 +83,11 @@ router.get('/:id/standings', getStandings);
  *   get:
  *     summary: Which teams break to elimination rounds, based on current standings
  *     tags: [Tournaments]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
  */
 router.get('/:id/break', getBreak);
 
@@ -69,6 +97,11 @@ router.get('/:id/break', getBreak);
  *   get:
  *     summary: Propose the next round's room draw (Swiss-style, avoiding rematches). Admin only; does not persist.
  *     tags: [Tournaments]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
  */
 router.get('/:id/pairings/next-round', requireAuth, requireRole('ADMIN'), getNextRoundPairings);
 
@@ -78,6 +111,11 @@ router.get('/:id/pairings/next-round', requireAuth, requireRole('ADMIN'), getNex
  *   get:
  *     summary: Download standings as a CSV file
  *     tags: [Tournaments]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
  */
 router.get('/:id/standings/export.csv', exportStandingsCsv);
 
@@ -87,6 +125,11 @@ router.get('/:id/standings/export.csv', exportStandingsCsv);
  *   get:
  *     summary: Download standings as a formatted PDF
  *     tags: [Tournaments]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
  */
 router.get('/:id/standings/export.pdf', exportStandingsPdf);
 
