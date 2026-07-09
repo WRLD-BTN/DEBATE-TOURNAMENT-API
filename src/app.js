@@ -16,7 +16,26 @@ const roundRoutes = require('./routes/round.routes');
 
 const app = express();
 
-app.use(helmet());
+// Helmet's default Content-Security-Policy blocks Swagger UI from
+// dynamically rendering the "Server response" section after Execute is
+// clicked (it needs 'unsafe-inline'/'unsafe-eval' for its own bundle to
+// inject that content). Apply the strict default everywhere EXCEPT
+// /docs, where we allow just enough to let Swagger's own static assets
+// run — this doesn't loosen anything on the actual API routes.
+app.use((req, res, next) => {
+  if (req.path.startsWith('/docs')) {
+    return helmet({
+      contentSecurityPolicy: {
+        directives: {
+          ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+          'script-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+          'style-src': ["'self'", "'unsafe-inline'", 'https:'],
+        },
+      },
+    })(req, res, next);
+  }
+  return helmet()(req, res, next);
+});
 app.use(cors());
 app.use(express.json());
 app.use(morgan(process.env.NODE_ENV === 'test' ? 'silent' : 'dev'));

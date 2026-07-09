@@ -31,7 +31,7 @@ const loginSchema = z.object({
  *             type: object
  *             required: [email, password, name]
  *             properties:
- *               email: { type: string, example: [email protected] }
+ *               email: { type: string, example: "[email protected]" }
  *               password: { type: string, example: AdminPass123 }
  *               name: { type: string, example: Admin }
  *               role: { type: string, enum: [ADMIN, ADJUDICATOR, DEBATER], example: ADMIN }
@@ -52,7 +52,7 @@ router.post('/register', validate(registerSchema), register);
  *             type: object
  *             required: [email, password]
  *             properties:
- *               email: { type: string, example: [email protected] }
+ *               email: { type: string, example: "[email protected]" }
  *               password: { type: string, example: AdminPass123 }
  */
 router.post('/login', validate(loginSchema), login);
