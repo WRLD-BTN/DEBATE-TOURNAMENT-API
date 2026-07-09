@@ -1,0 +1,237 @@
+{
+  "info": {
+    "name": "Debate Tournament Management API",
+    "description": "Full API surface: auth, tournaments, teams, rounds, ballots, pairings, and exports. Set {{baseUrl}} and run 'Register Admin' + 'Login' first to populate {{token}} automatically.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4000" },
+    { "key": "token", "value": "" },
+    { "key": "tournamentId", "value": "" },
+    { "key": "teamIdA", "value": "" },
+    { "key": "teamIdB", "value": "" },
+    { "key": "teamIdC", "value": "" },
+    { "key": "teamIdD", "value": "" },
+    { "key": "roundId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register Admin",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"[email protected]\",\n  \"password\": \"AdminPass123\",\n  \"name\": \"Admin\",\n  \"role\": \"ADMIN\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set('token', pm.response.json().token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"[email protected]\",\n  \"password\": \"AdminPass123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.collectionVariables.set('token', pm.response.json().token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tournaments",
+      "item": [
+        {
+          "name": "Create Tournament",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/tournaments",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Test Cup\",\n  \"startDate\": \"2026-08-01T00:00:00.000Z\",\n  \"endDate\": \"2026-08-02T00:00:00.000Z\",\n  \"breakSize\": 4\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set('tournamentId', pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        { "name": "List Tournaments", "request": { "method": "GET", "url": "{{baseUrl}}/api/tournaments" } },
+        { "name": "Get Tournament", "request": { "method": "GET", "url": "{{baseUrl}}/api/tournaments/{{tournamentId}}" } },
+        { "name": "Get Standings", "request": { "method": "GET", "url": "{{baseUrl}}/api/tournaments/{{tournamentId}}/standings" } },
+        { "name": "Get Break", "request": { "method": "GET", "url": "{{baseUrl}}/api/tournaments/{{tournamentId}}/break" } },
+        {
+          "name": "Get Next-Round Pairings",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/tournaments/{{tournamentId}}/pairings/next-round"
+          }
+        },
+        { "name": "Export Standings CSV", "request": { "method": "GET", "url": "{{baseUrl}}/api/tournaments/{{tournamentId}}/standings/export.csv" } },
+        { "name": "Export Standings PDF", "request": { "method": "GET", "url": "{{baseUrl}}/api/tournaments/{{tournamentId}}/standings/export.pdf" } }
+      ]
+    },
+    {
+      "name": "Teams",
+      "item": [
+        {
+          "name": "Register Team A",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/tournaments/{{tournamentId}}/teams",
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Team Alpha\",\n  \"debaterNames\": [\"Debater 1\", \"Debater 2\"]\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": ["if (pm.response.code === 201) { pm.collectionVariables.set('teamIdA', pm.response.json().id); }"] }
+            }
+          ]
+        },
+        {
+          "name": "Register Team B",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/tournaments/{{tournamentId}}/teams",
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Team Bravo\",\n  \"debaterNames\": [\"Debater 3\", \"Debater 4\"]\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": ["if (pm.response.code === 201) { pm.collectionVariables.set('teamIdB', pm.response.json().id); }"] }
+            }
+          ]
+        },
+        {
+          "name": "Register Team C",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/tournaments/{{tournamentId}}/teams",
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Team Charlie\",\n  \"debaterNames\": [\"Debater 5\", \"Debater 6\"]\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": ["if (pm.response.code === 201) { pm.collectionVariables.set('teamIdC', pm.response.json().id); }"] }
+            }
+          ]
+        },
+        {
+          "name": "Register Team D",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/tournaments/{{tournamentId}}/teams",
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Team Delta\",\n  \"debaterNames\": [\"Debater 7\", \"Debater 8\"]\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": ["if (pm.response.code === 201) { pm.collectionVariables.set('teamIdD', pm.response.json().id); }"] }
+            }
+          ]
+        },
+        { "name": "List Teams", "request": { "method": "GET", "url": "{{baseUrl}}/api/tournaments/{{tournamentId}}/teams" } }
+      ]
+    },
+    {
+      "name": "Rounds",
+      "item": [
+        {
+          "name": "Create Round 1",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/tournaments/{{tournamentId}}/rounds",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roundNumber\": 1,\n  \"motionText\": \"This House Would test its own API.\",\n  \"teamAssignments\": [\n    { \"teamId\": \"{{teamIdA}}\", \"position\": \"OG\" },\n    { \"teamId\": \"{{teamIdB}}\", \"position\": \"OO\" },\n    { \"teamId\": \"{{teamIdC}}\", \"position\": \"CG\" },\n    { \"teamId\": \"{{teamIdD}}\", \"position\": \"CO\" }\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": ["if (pm.response.code === 201) { pm.collectionVariables.set('roundId', pm.response.json().id); }"] }
+            }
+          ]
+        },
+        {
+          "name": "Submit Ballot",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/rounds/{{roundId}}/ballot",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"results\": [\n    { \"teamId\": \"{{teamIdA}}\", \"speakerPts\": 160 },\n    { \"teamId\": \"{{teamIdB}}\", \"speakerPts\": 150 },\n    { \"teamId\": \"{{teamIdC}}\", \"speakerPts\": 145 },\n    { \"teamId\": \"{{teamIdD}}\", \"speakerPts\": 140 }\n  ]\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

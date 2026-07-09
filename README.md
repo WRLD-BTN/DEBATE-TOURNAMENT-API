@@ -34,6 +34,21 @@ standings are the sum of team points (speaker points as tiebreaker) across
 all rounds, and the "break" is the top N teams that advance to
 elimination rounds.
 
+## Features
+
+- **Auth & roles** — JWT-based, with `ADMIN`/`ADJUDICATOR`/`DEBATER` roles enforced per-route
+- **Tournament/team/round/ballot CRUD** — see `/docs` for the full route list
+- **Computed standings & break** — pure-function scoring logic (`src/services/scoring.service.js`), fully unit tested
+- **Swiss-style pairing proposals** (`GET /api/tournaments/:id/pairings/next-round`) — given current standings, proposes the next round's 4-team room draw, swapping teams to avoid rematches where possible. Read-only: it proposes, an admin still creates the actual round via `POST .../rounds`.
+- **CSV/PDF export** of standings (`GET .../standings/export.csv` and `.../export.pdf`) — for handing results to a tournament director or debaters directly
+
+## Testing the API without writing code
+
+A Postman collection is included: `postman_collection.json`. Import it into
+Postman, set the `baseUrl` variable to your local or deployed URL, and run
+requests top-to-bottom — "Register Admin" and "Create Tournament" etc.
+automatically save IDs into collection variables for later requests to use.
+
 ## Getting started
 
 ```bash
@@ -54,12 +69,15 @@ API runs at `http://localhost:4000`, interactive docs at `http://localhost:4000/
 npm test
 ```
 
-The scoring-logic unit tests (`tests/scoring.service.test.js`) run
-anywhere, no database required — that logic is deliberately kept as pure
-functions. The auth integration test additionally requires a reachable
-`DATABASE_URL`; it's automatically skipped if one isn't set, so `npm test`
-never fails in an environment without Postgres. CI provisions a real
-Postgres service container so the full suite runs on every push.
+The pure-logic unit tests (`scoring.service.test.js`, `pairing.service.test.js`,
+`export.service.test.js`) run anywhere, no database required — that logic is
+deliberately kept as plain functions with no Express/Prisma dependency.
+The integration tests (`auth.test.js`, `tournamentFlow.integration.test.js`)
+additionally require a reachable `DATABASE_URL`; they're automatically
+skipped if one isn't set, so `npm test` never fails in an environment
+without Postgres. CI provisions a real Postgres service container so the
+full suite — including the full tournament→team→round→ballot→standings
+flow — runs on every push.
 
 ## Example flow
 

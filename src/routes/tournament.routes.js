@@ -8,6 +8,9 @@ const {
   getTournament,
   getStandings,
   getBreak,
+  getNextRoundPairings,
+  exportStandingsCsv,
+  exportStandingsPdf,
 } = require('../controllers/tournament.controller');
 
 const router = express.Router();
@@ -59,5 +62,32 @@ router.get('/:id/standings', getStandings);
  *     tags: [Tournaments]
  */
 router.get('/:id/break', getBreak);
+
+/**
+ * @openapi
+ * /api/tournaments/{id}/pairings/next-round:
+ *   get:
+ *     summary: Propose the next round's room draw (Swiss-style, avoiding rematches). Admin only; does not persist.
+ *     tags: [Tournaments]
+ */
+router.get('/:id/pairings/next-round', requireAuth, requireRole('ADMIN'), getNextRoundPairings);
+
+/**
+ * @openapi
+ * /api/tournaments/{id}/standings/export.csv:
+ *   get:
+ *     summary: Download standings as a CSV file
+ *     tags: [Tournaments]
+ */
+router.get('/:id/standings/export.csv', exportStandingsCsv);
+
+/**
+ * @openapi
+ * /api/tournaments/{id}/standings/export.pdf:
+ *   get:
+ *     summary: Download standings as a formatted PDF
+ *     tags: [Tournaments]
+ */
+router.get('/:id/standings/export.pdf', exportStandingsPdf);
 
 module.exports = router;
