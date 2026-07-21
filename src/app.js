@@ -16,12 +16,8 @@ const roundRoutes = require('./routes/round.routes');
 
 const app = express();
 
-// Helmet's default Content-Security-Policy blocks Swagger UI from
-// dynamically rendering the "Server response" section after Execute is
-// clicked (it needs 'unsafe-inline'/'unsafe-eval' for its own bundle to
-// inject that content). Apply the strict default everywhere EXCEPT
-// /docs, where we allow just enough to let Swagger's own static assets
-// run — this doesn't loosen anything on the actual API routes.
+// Helmet's default Content-Security-Policy blocks Swagger UI 
+
 app.use((req, res, next) => {
   if (req.path.startsWith('/docs')) {
     return helmet({
@@ -51,6 +47,36 @@ app.use(
 );
 
 app.get('/health', (req, res) => res.json({ status: 'ok', uptime: process.uptime() }));
+
+// A small landing page at the root, mainly so a bare visit to the deployed
+
+app.get('/', (req, res) => {
+  res.type('html').send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Debate Tournament Management API</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 4rem auto; padding: 0 1.5rem; color: #1a1a1a; line-height: 1.6; }
+    h1 { font-size: 1.5rem; }
+    a { color: #2563eb; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { background: #f4f4f5; padding: 0.15em 0.4em; border-radius: 4px; font-size: 0.9em; }
+    ul { padding-left: 1.2rem; }
+  </style>
+</head>
+<body>
+  <h1>Debate Tournament Management API</h1>
+  <p>REST API for managing British Parliamentary debate tournaments — teams, rounds, ballots, computed standings, Swiss-style pairing, and CSV/PDF export.</p>
+  <ul>
+    <li><a href="/docs">Interactive API docs (Swagger)</a></li>
+    <li><a href="/health">Health check</a></li>
+    <li><a href="/api/tournaments">GET /api/tournaments</a> — list tournaments</li>
+  </ul>
+  <p>Source on <a href="https://github.com/WRLD-BTN/debate-tournament-api">GitHub</a>.</p>
+</body>
+</html>`);
+});
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
